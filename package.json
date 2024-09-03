@@ -1,0 +1,25 @@
+{
+  "name": "fullstack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.6.0"
+  },
+  "devDependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "nodemo": "^1.0.0",
+    "nodemon": "^3.1.4"
+  }
+}
