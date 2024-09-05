@@ -5,10 +5,16 @@ import {
   loginValidation,
   postCreateValidation,
 } from "./validations.js";
-import checkAuth from "./utils/checkAuth.js";
 
-import * as UserController from "./controllers/UserController.js"; /* Importa toate metodele in variabila UserController */
-import * as PostController from "./controllers/PostController.js"; /* Importa toate metodele in variabila PostrController */
+import { checkAuth, handleValidationErrors } from "./utils/index.js";
+
+import multer from "multer";
+
+import {
+  PostController,
+  UserController,
+} from "./controllers/index.js"; /* Importa toate metodele in variabila PostrController */
+
 
 mongoose
   .connect(
@@ -19,15 +25,58 @@ mongoose
 
 const app = express();
 
-app.use(express.json());
+const storage = multer.diskStorage({
+  destination: (_, __, cb) => {
+    cb(null, "uploads");
+  },
+  fileName: (_, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
 
-app.use("/auth/login", loginValidation, UserController.login);
+const upload = multer({ storage });
+
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
+
+app.use(
+  "/auth/login",
+  loginValidation,
+  handleValidationErrors,
+  UserController.login
+);
 /* cand vine un request pe server, trece prin registerValidation care verifica toate datele precum noi am introdus */
-app.post("/auth/register", registerValidation, UserController.register);
+app.post(
+  "/auth/register",
+  registerValidation,
+  handleValidationErrors,
+  UserController.register
+);
 app.get("/auth/me", checkAuth, UserController.getMe);
 
-app.get("/posts", checkAuth, postCreateValidation, PostController.create);
+app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
+  res.json({
+    url: `/uploads/${req.file.originalname}`,
+  });
+});
+
+app.post(
+  "/posts",
+  checkAuth,
+  postCreateValidation,
+  handleValidationErrors,
+  PostController.create
+);
 app.get("/posts", PostController.getAll);
+app.get("/posts/:id", PostController.getOne);
+app.delete("/posts/:id", checkAuth, PostController.remove);
+app.patch(
+  "/posts/:id",
+  checkAuth,
+  postCreateValidation,
+  handleValidationErrors,
+  PostController.update
+);
 
 app.listen(4444, (err) => {
   if (err) {
