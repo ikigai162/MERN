@@ -5,6 +5,7 @@ import {
   loginValidation,
   postCreateValidation,
 } from "./validations.js";
+import cors from "cors";
 
 import { checkAuth, handleValidationErrors } from "./utils/index.js";
 
@@ -14,7 +15,7 @@ import {
   PostController,
   UserController,
 } from "./controllers/index.js"; /* Importa toate metodele in variabila PostrController */
-
+import user from "./models/user.js";
 
 mongoose
   .connect(
@@ -37,6 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(express.json());
+app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
 app.use(
@@ -67,7 +69,9 @@ app.post(
   handleValidationErrors,
   PostController.create
 );
+app.get("/tags", PostController.getLastTags);
 app.get("/posts", PostController.getAll);
+app.get("/posts/tags", PostController.getLastTags);
 app.get("/posts/:id", PostController.getOne);
 app.delete("/posts/:id", checkAuth, PostController.remove);
 app.patch(
@@ -84,3 +88,4 @@ app.listen(4444, (err) => {
   }
   console.log("Server ok");
 });
+
