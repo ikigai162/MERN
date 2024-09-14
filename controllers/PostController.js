@@ -23,12 +23,12 @@ export const getLastTags = async (req, res) => {
       .flat()
       .slice(0, 5);
 
-    res.json(posts);
+    res.json(tags); // Returnează doar tag-urile, nu postările
   } catch (err) {
     console.log(err);
 
     res.status(500).json({
-      message: "Nu s-au putut prelua postările",
+      message: "Nu s-au putut prelua tag-urile",
     });
   }
 };
@@ -48,7 +48,7 @@ export const getOne = async (req, res) => {
       {
         returnDocument: "after", // Returnează documentul după actualizare
       }
-    );
+    ).populate("user");
 
     // Verifică dacă postarea există
     if (!doc) {
@@ -72,11 +72,14 @@ export const getOne = async (req, res) => {
 export const create = async (req, res) => {
   try {
     console.log(req.body);
+
+    // Poți adăuga validări suplimentare pentru câmpuri, dacă este nevoie
+
     const doc = new PostModel({
       title: req.body.title,
       text: req.body.text,
       imageUrl: req.body.imageUrl,
-      tags: req.body.tags,
+      tags: req.body.tags.split(","),
       user: req.userId,
     });
 
@@ -128,13 +131,15 @@ export const update = async (req, res) => {
         title: req.body.title,
         text: req.body.text,
         imageUrl: req.body.imageUrl,
-        tags: req.body.tags,
+        tags: req.body.tags.split(","),
         user: req.userId,
-      },
-      res.json({
-        succes: true,
-      })
+      }
     );
+
+    // Trimiți răspunsul succes după ce se face actualizarea
+    res.json({
+      succes: true,
+    });
   } catch (err) {
     console.log(err);
 

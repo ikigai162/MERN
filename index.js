@@ -30,7 +30,8 @@ const storage = multer.diskStorage({
   destination: (_, __, cb) => {
     cb(null, "uploads");
   },
-  fileName: (_, file, cb) => {
+  filename: (_, file, cb) => {
+    //Am avut o err fileName in loc de filename
     cb(null, file.originalname);
   },
 });
@@ -88,4 +89,3 @@ app.listen(4444, (err) => {
   }
   console.log("Server ok");
 });
-
